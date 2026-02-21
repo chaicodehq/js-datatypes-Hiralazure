@@ -19,7 +19,7 @@
  *   - Agar input string nahi hai, return ""
  *   - Agar string trim karne ke baad empty hai, return ""
  *
- * @param {string} title - Messy Bollywood movie title
+ * @param {string} title - Messy Bollywood movie titlec
  * @returns {string} Cleaned up Title Case title
  *
  * @example
@@ -30,5 +30,22 @@
  *   // => "Dil ka Kya Kare"
  */
 export function fixBollywoodTitle(title) {
-  // Your code here
+  if (typeof title != "string") return "";
+  title = title.trim();
+  console.log("hwrew", title);
+  // if (title !== "") return "";
+  console.log("hwrew", title);
+  let arrTitle = title.replace(/\s+/g, " ").split(" ");
+  console.log("test", arrTitle);
+  let arrExpectional = ["ke", "a", "in", "of", "the", "ki", "ka"];
+  return arrTitle
+    .map((e, i) => {
+      const lower = e.toLowerCase().trim();
+      if (i !== 0 && arrExpectional.includes(e)) {
+        return lower.trim();
+      }
+      return `${lower.charAt(0).toUpperCase()}${lower.slice(1).toLowerCase()}`;
+    })
+    .join(" ");
 }
+console.log(fixBollywoodTitle("ek tha tiger ke baad"));

@@ -47,5 +47,100 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  if (!Array.isArray(transactions) || transactions.length === 0) return null;
+
+  // Valid transactions: amount > 0 and type is debit or credit
+  const validTransactions = transactions.filter(
+    (trans) =>
+      trans &&
+      typeof trans.amount === "number" &&
+      trans.amount > 0 &&
+      (trans.type === "debit" || trans.type === "credit"),
+  );
+
+  if (validTransactions.length === 0) return null;
+
+  // Total amount (sum of all transaction amounts)
+  const totalAmount = validTransactions.reduce(
+    (sum, trans) => sum + trans.amount,
+    0,
+  );
+  let freq = {};
+  let frequentContact = null;
+
+  validTransactions.forEach((trans) => {
+    if (!trans.to) return;
+
+    freq[trans.to] = (freq[trans.to] || 0) + 1;
+
+    if (frequentContact === null || freq[trans.to] > freq[frequentContact]) {
+      frequentContact = trans.to;
+    }
+  });
+  const highestTransaction = validTransactions.reduce((max, trans) => {
+    if (!max || trans.amount > max.amount) return trans;
+    return max;
+  }, null);
+  const { totalCredit, totalDebit } = validTransactions.reduce(
+    (acc, trans) => {
+      if (trans.type === "credit") acc.totalCredit += trans.amount;
+      if (trans.type === "debit") acc.totalDebit += trans.amount;
+      return acc;
+    },
+    { totalCredit: 0, totalDebit: 0 },
+  );
+
+  // Net balance
+  const netBalance = totalCredit - totalDebit;
+
+  // Category breakdown
+  const categoryBreakdown = validTransactions.reduce((acc, trans) => {
+    const category = trans.category || "uncategorized";
+    acc[category] = (acc[category] || 0) + trans.amount;
+    return acc;
+  }, {});
+
+  // Count & average
+  const transactionCount = validTransactions.length;
+  const avgTransaction = parseFloat(
+    (totalAmount / transactionCount).toFixed(2),
+  );
+
+  // Checks
+  const allAbove100 = validTransactions.every((t) => t.amount > 100);
+  const hasLargeTransaction = validTransactions.some((t) => t.amount > 500);
+
+  return {
+    validTransactions,
+    totalAmount,
+    totalCredit,
+    totalDebit,
+    netBalance,
+    frequentContact,
+    categoryBreakdown,
+    transactionCount,
+    avgTransaction,
+    allAbove100,
+    hasLargeTransaction,
+  };
 }
+console.log(
+  analyzeUPITransactions([
+    {
+      id: "T1",
+      type: "debit",
+      amount: 200,
+      to: "A",
+      category: "food",
+      date: "2025-01-01",
+    },
+    {
+      id: "T2",
+      type: "debit",
+      amount: 150,
+      to: "B",
+      category: "food",
+      date: "2025-01-02",
+    },
+  ]),
+);

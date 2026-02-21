@@ -39,5 +39,38 @@
  *   // => { baseAmount: 500, gstRate: 0, gstAmount: 0, totalAmount: 500 }
  */
 export function calculateGST(amount, category) {
-  // Your code here
+  console.log(Number.isFinite(amount), typeof amount != "number");
+  if (
+    typeof amount != "number" ||
+    !Number.isFinite(amount) ||
+    Number.isNaN(amount) ||
+    amount <= 0
+  )
+    return null;
+  let arrRates = {
+    essential: 0,
+    food: 5,
+    standard: 12,
+    electronics: 18,
+    luxury: 28,
+  };
+  if (typeof category != "string" || category == "" || category == null)
+    return null;
+  let ratesKey = Object.keys(arrRates);
+  category = category.toLowerCase();
+  console.log(category, ratesKey);
+  if (!ratesKey.includes(category)) return null;
+
+  let gstAmount = parseFloat(
+    ((amount * arrRates[category.toLowerCase()]) / 100).toFixed(2),
+  );
+  let totalAmount = gstAmount + amount;
+  totalAmount = parseFloat(totalAmount.toFixed(2));
+  return {
+    baseAmount: amount,
+    gstRate: arrRates[category.toLowerCase()],
+    totalAmount,
+    gstAmount,
+  };
 }
+console.log(calculateGST(200, "food"));
